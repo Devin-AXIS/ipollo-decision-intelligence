@@ -6,7 +6,7 @@ iPolloWork 的独立 DSH 插件。在原生对话提出决策问题或附上 PPT
 
 从 [GitHub Releases](https://github.com/Devin-AXIS/ipollo-decision-intelligence/releases) 下载发布包，在 iPolloWork 插件管理器中安装，或运行：
 
-    dsh plugin --profile web add /absolute/path/ipollo-dsh-decision-intelligence-1.0.1.tgz
+    dsh plugin --profile web add /absolute/path/ipollo-dsh-decision-intelligence-1.0.2.tgz
 
 1. 在当前工作区的原生对话提出需求，可直接附上 PPT。「请用决策情报 Skill 生成图谱」即可启动调查。
 2. 在右侧栏点「＋ → 决策情报」。图谱自动保存到当前工作区，可切换历史版本。

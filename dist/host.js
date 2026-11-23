@@ -19820,10 +19820,12 @@ async function openStore(service, workspace) {
   return app;
 }
 var saves = /* @__PURE__ */ new Map();
+var maxReportLength = 12e5;
+var maxSnapshotBytes = maxReportLength * 3;
 async function saveSessionReport(app, session, raw) {
   const report = parseReport(raw);
   const payload = JSON.stringify(report);
-  if (payload.length > 12e5) throw Error("\u56FE\u8C31\u8FC7\u5927\uFF0C\u8BF7\u7F29\u51CF\u5D4C\u5165\u56FE\u7247");
+  if (payload.length > maxReportLength) throw Error("\u56FE\u8C31\u8FC7\u5927\uFF0C\u8BF7\u7F29\u51CF\u5D4C\u5165\u56FE\u7247");
   const digest = createHash("sha256").update(payload).digest("hex");
   const key2 = app.id + ":" + session;
   const previous = saves.get(key2);
@@ -19846,11 +19848,17 @@ async function saveSessionReport(app, session, raw) {
 }
 async function saveReport(app, row, report, payload, digest) {
   const chunks = [];
-  for (let offset = 0; offset < payload.length; ) {
-    let end = Math.min(offset + 2600, payload.length);
-    if (end < payload.length && /[\uD800-\uDBFF]/.test(payload[end - 1])) end--;
-    chunks.push({ report: row.id, sequence: chunks.length, body: payload.slice(offset, end) });
-    offset = end;
+  if (Object.values(report.photos ?? {}).some((photo) => photo.url.startsWith("data:"))) {
+    if (!app.files) throw Error("\u5E94\u7528\u6570\u636E\u9644\u4EF6\u670D\u52A1\u4E0D\u53EF\u7528\uFF0C\u65E0\u6CD5\u4FDD\u5B58\u5E26\u5185\u5D4C\u56FE\u7247\u7684\u56FE\u8C31");
+    const file2 = await app.files.upload(row.id + ".json", new TextEncoder().encode(payload), { mime: "application/json" });
+    chunks.push({ report: row.id, sequence: -1, body: file2.id });
+  } else {
+    for (let offset = 0; offset < payload.length; ) {
+      let end = Math.min(offset + 2600, payload.length);
+      if (end < payload.length && /[\uD800-\uDBFF]/.test(payload[end - 1])) end--;
+      chunks.push({ report: row.id, sequence: chunks.length, body: payload.slice(offset, end) });
+      offset = end;
+    }
   }
   const batch = [];
   for (let i = 0; i < chunks.length; i += 100) batch.push({ insert: "parts", values: chunks.slice(i, i + 100) });
@@ -19862,9 +19870,34 @@ async function readReport(app, id) {
   const row = await app.collection("reports").get(id);
   if (row.state !== "ready") throw Error("\u8C03\u67E5\u5C1A\u672A\u5B8C\u6210");
   const parts = await app.collection("parts").all({ where: { report: id }, sort: "sequence" });
-  const payload = parts.map((p) => p.body).join("");
-  if (parts.length !== row.count || createHash("sha256").update(payload).digest("hex") !== row.digest) throw Error("\u56FE\u8C31\u6570\u636E\u4E0D\u5B8C\u6574");
+  if (parts.length !== row.count) throw Error("\u56FE\u8C31\u6570\u636E\u4E0D\u5B8C\u6574");
+  const attachment = parts.length === 1 && parts[0]?.sequence === -1 ? String(parts[0].body) : null;
+  const payload = attachment ? await readSnapshot(app, attachment) : parts.map((p) => p.body).join("");
+  if (createHash("sha256").update(payload).digest("hex") !== row.digest) throw Error("\u56FE\u8C31\u6570\u636E\u4E0D\u5B8C\u6574");
   return parseReport(JSON.parse(payload));
+}
+async function readSnapshot(app, id) {
+  if (!app.files || !/^[0-9a-f-]{36}$/i.test(id)) throw Error("\u56FE\u8C31\u9644\u4EF6\u4E0D\u53EF\u7528");
+  const location = new URL((await app.files.download(id)).url);
+  if (location.protocol !== "https:" || location.username || location.password) throw Error("\u56FE\u8C31\u9644\u4EF6\u5730\u5740\u65E0\u6548");
+  const response = await fetch(location, { redirect: "error", signal: AbortSignal.timeout(2e4) });
+  if (!response.ok || !response.body) throw Error("\u65E0\u6CD5\u8BFB\u53D6\u56FE\u8C31\u9644\u4EF6");
+  const reader = response.body.getReader();
+  const chunks = [];
+  let length = 0;
+  try {
+    for (; ; ) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      length += value.byteLength;
+      if (length > maxSnapshotBytes) throw Error("\u56FE\u8C31\u9644\u4EF6\u8FC7\u5927");
+      chunks.push(value);
+    }
+  } finally {
+    await reader.cancel().catch(() => {
+    });
+  }
+  return Buffer.concat(chunks).toString("utf8");
 }
 
 // src/publish.ts

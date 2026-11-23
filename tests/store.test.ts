@@ -69,3 +69,34 @@ test('retry completes an earlier version reservation without exposing an unfinis
   assert.equal(await saveSessionReport(store.app, 'legacy-chat', atlas), legacy.id);
   assert.equal((await readReport(store.app, legacy.id)).title, atlas.title);
 });
+
+test('an atlas with embedded art uses a private attachment and restores the original document', async t => {
+  const store = memoryApp('art-workspace');
+  const image = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ==';
+  const report = { ...atlas, photos: { [atlas.tree.id]: { caption: '外景', url: image } } };
+  const fileId = '3fc6fbda-2895-4b85-9e2e-9271678c44aa';
+  let snapshot: Uint8Array | undefined;
+  store.app.files = {
+    upload: async (name, bytes, options) => {
+      assert.match(name, /\.json$/);
+      assert.equal(options.mime, 'application/json');
+      snapshot = bytes;
+      return { id: fileId };
+    },
+    download: async id => {
+      assert.equal(id, fileId);
+      return { url: 'https://storage.example/signed-snapshot' };
+    },
+  };
+  t.mock.method(globalThis, 'fetch', async () => {
+    assert.ok(snapshot);
+    return new Response(new Uint8Array(snapshot).buffer);
+  });
+  const id = await saveSessionReport(store.app, 'current-chat', report);
+  const parts = await store.app.collection('parts').all({ where: { report: id } });
+  assert.equal(parts.length, 1);
+  assert.equal(parts[0]?.body, fileId);
+  assert.equal((await readReport(store.app, id)).photos?.[atlas.tree.id]?.url, image);
+  snapshot = new TextEncoder().encode('{}');
+  await assert.rejects(readReport(store.app, id), /图谱数据不完整/);
+});

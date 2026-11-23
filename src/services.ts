@@ -17,6 +17,10 @@ export interface DataApp {
   id:string;
   run(input:{batch: DataStatement[]}):Promise<unknown>;
   collection(name:string):Collection;
+  files?: {
+    upload(name:string,bytes:Uint8Array,options:{mime:string}):Promise<{id:string}>;
+    download(id:string):Promise<{url:string}>;
+  };
 }
 export interface IpolloData {open(name:string):Promise<DataApp>}
 export interface ServiceBinding {
