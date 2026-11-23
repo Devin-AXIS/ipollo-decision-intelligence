@@ -1,0 +1,315 @@
+{
+  "version": 1,
+  "key": "storage-history",
+  "title": "储能产业链",
+  "question": "电池降价，怎样传导到一座储能电站的收益？",
+  "tree": {
+    "id": "storage",
+    "label": "储能产业链",
+    "role": "主题",
+    "note": "2024 年历史截面与技术基准。",
+    "children": [
+      {
+        "id": "tech",
+        "label": "电池制造与价格",
+        "role": "上游驱动",
+        "note": "制造规模扩大与研发进步推动了锂离子电池价格下降。",
+        "children": [
+          {
+            "id": "price0",
+            "label": "起点价格",
+            "metric": "1,400 美元/kWh",
+            "metric_label": "2010 年锂离子电池价格",
+            "kind": "历史数据",
+            "refs": [
+              "iea"
+            ],
+            "note": "IEA 的全球历史回顾。"
+          },
+          {
+            "id": "price1",
+            "label": "终点价格",
+            "metric": "低于 140 美元/kWh",
+            "metric_label": "2023 年锂离子电池价格",
+            "kind": "历史数据",
+            "refs": [
+              "iea"
+            ],
+            "note": "覆盖锂离子电池，不等于某一座电站的交钥匙报价。"
+          },
+          {
+            "id": "lfp",
+            "label": "化学体系",
+            "metric": "80%",
+            "metric_label": "2023 新增电池储能中 LFP 占比",
+            "kind": "历史数据",
+            "refs": [
+              "iea"
+            ],
+            "note": "LFP 指磷酸铁锂电池。"
+          }
+        ]
+      },
+      {
+        "id": "system",
+        "label": "电站系统造价",
+        "role": "中游传导",
+        "note": "采购电池只是总投资的一部分。储能时长决定每 kW 功率要配多少 kWh 电池。",
+        "children": [
+          {
+            "id": "capex",
+            "label": "系统成本构成",
+            "metric": "",
+            "metric_label": "",
+            "kind": "来源模型",
+            "refs": [
+              "atb"
+            ],
+            "note": "每 kW 系统成本 = 每 kWh 电池包成本 × 储能时长 + 每 kW 其他系统成本。"
+          },
+          {
+            "id": "duration",
+            "label": "基准时长",
+            "metric": "4 小时",
+            "metric_label": "ATB 默认储能时长",
+            "kind": "模型假设",
+            "refs": [
+              "atb"
+            ],
+            "note": "用于美国公用事业级储能模型；各项目可采用不同时长。"
+          }
+        ]
+      },
+      {
+        "id": "dispatch",
+        "label": "充放电与调度",
+        "role": "运营因子",
+        "note": "可售电量取决于充入电量、往返效率以及实际可用的调度窗口。",
+        "children": [
+          {
+            "id": "rte",
+            "label": "往返效率",
+            "metric": "85%",
+            "metric_label": "ATB 建模假设",
+            "kind": "模型假设",
+            "refs": [
+              "atb"
+            ],
+            "note": "按该假设，每充入 1 kWh，可放出约 0.85 kWh。"
+          },
+          {
+            "id": "cycles",
+            "label": "使用频率",
+            "metric": "约 1 次/日",
+            "metric_label": "ATB 建模循环假设",
+            "kind": "模型假设",
+            "refs": [
+              "atb"
+            ],
+            "note": "真实循环次数由调度、价差、并网限制及衰减共同决定。"
+          }
+        ]
+      },
+      {
+        "id": "market",
+        "label": "全球电力储能部署",
+        "role": "需求背景",
+        "note": "装机量用来说明产业规模。测算项目现金流还需要当地结算价格与出力数据。",
+        "children": [
+          {
+            "id": "add",
+            "label": "新增装机",
+            "metric": "42 GW",
+            "metric_label": "2023 年全球新增电池储能功率",
+            "kind": "历史数据",
+            "refs": [
+              "iea"
+            ],
+            "note": "电力部门新增装机，包括公用事业级、表后、微网与太阳能家庭系统。"
+          },
+          {
+            "id": "fleet",
+            "label": "在用规模",
+            "metric": "超过 85 GW",
+            "metric_label": "2023 年全球电力部门在用储能",
+            "kind": "历史数据",
+            "refs": [
+              "iea"
+            ],
+            "note": "功率口径。比较储能电量时还需设备时长。"
+          }
+        ]
+      },
+      {
+        "id": "result",
+        "label": "电站收益与边界",
+        "role": "可检验结果",
+        "note": "把电价、效率和资本成本放到同一份项目账本里。",
+        "children": [
+          {
+            "id": "spread",
+            "label": "套利毛贡献",
+            "metric": "",
+            "metric_label": "",
+            "kind": "推演",
+            "refs": [
+              "atb"
+            ],
+            "note": "每充入 1 kWh 的简化毛贡献 = 往返效率 × 放电结算价 − 充电购入价；尚未扣除运维、衰减、税费和融资。"
+          },
+          {
+            "id": "verify",
+            "label": "验证真实收益",
+            "kind": "待验证",
+            "gap": "收集逐时价格、实际调度、并网容量、设备衰减与电站合同，逐时回算可兑现现金流。"
+          }
+        ]
+      }
+    ]
+  },
+  "sources": {
+    "iea": {
+      "title": "Batteries and Secure Energy Transitions",
+      "org": "IEA",
+      "date": "2024 报告 / 2023 数据",
+      "url": "https://www.iea.org/reports/batteries-and-secure-energy-transitions/executive-summary",
+      "scope": "全球历史数据。价格是锂离子电池价格，部署数据为电力部门储能功率。"
+    },
+    "atb": {
+      "title": "2024 ATB · Utility-Scale Battery Storage",
+      "org": "NREL / ATB",
+      "date": "2024 模型",
+      "url": "https://atb.nlr.gov/electricity/2024/utility-scale_battery_storage",
+      "scope": "美国公用事业级独立储能的技术成本基准。效率与循环频率属于建模假设。"
+    }
+  },
+  "photos": {},
+  "links": [
+    {
+      "start": "tech",
+      "end": "system",
+      "label": "改变电池包成本",
+      "status": "来源模型",
+      "reason": "系统成本公式中，电池包价格乘以储能时长；其他系统成本另计。"
+    },
+    {
+      "start": "system",
+      "end": "result",
+      "label": "影响投资回收",
+      "status": "推演",
+      "reason": "电量收入相同的条件下，初始投资更低会缩短简单回收期。需要代入项目合同。"
+    },
+    {
+      "start": "dispatch",
+      "end": "result",
+      "label": "改变可售电量",
+      "status": "来源模型",
+      "reason": "往返效率把购入电量转换为放出电量，调度时点决定对应结算价。"
+    },
+    {
+      "start": "market",
+      "end": "result",
+      "label": "约束市场判断",
+      "status": "待验证假设",
+      "reason": "部署扩大可能改变当地市场竞争。影响价差的方向与幅度需要分市场检验。"
+    }
+  ],
+  "highlights": {
+    "storage": [
+      {
+        "ref": "price1",
+        "value": "低于 140 美元/kWh",
+        "label": "2023 年锂离子电池价格",
+        "kind": "历史数据"
+      },
+      {
+        "ref": "add",
+        "value": "42 GW",
+        "label": "2023 年全球新增电池储能功率",
+        "kind": "历史数据"
+      },
+      {
+        "ref": "rte",
+        "value": "85%",
+        "label": "ATB 建模假设",
+        "kind": "模型假设"
+      },
+      {
+        "ref": "duration",
+        "value": "4 小时",
+        "label": "ATB 默认储能时长",
+        "kind": "模型假设"
+      }
+    ]
+  },
+  "panels": {
+    "storage": [
+      {
+        "kind": "gauge",
+        "title": "基准往返效率",
+        "unit": "%",
+        "rows": [
+          [
+            "放出电量 / 充入电量",
+            85
+          ]
+        ],
+        "caption": "NREL 2024 ATB 技术基准。实际效率取决于系统和运行条件。",
+        "refs": [
+          "rte"
+        ]
+      }
+    ],
+    "rte": [
+      {
+        "kind": "gauge",
+        "title": "基准往返效率",
+        "unit": "%",
+        "rows": [
+          [
+            "放出电量 / 充入电量",
+            85
+          ]
+        ],
+        "caption": "NREL 2024 ATB 技术基准。实际效率取决于系统和运行条件。",
+        "refs": [
+          "rte"
+        ]
+      }
+    ],
+    "dispatch": [
+      {
+        "kind": "gauge",
+        "title": "基准往返效率",
+        "unit": "%",
+        "rows": [
+          [
+            "放出电量 / 充入电量",
+            85
+          ]
+        ],
+        "caption": "NREL 2024 ATB 技术基准。实际效率取决于系统和运行条件。",
+        "refs": [
+          "rte"
+        ]
+      }
+    ],
+    "result": [
+      {
+        "kind": "gauge",
+        "title": "基准往返效率",
+        "unit": "%",
+        "rows": [
+          [
+            "放出电量 / 充入电量",
+            85
+          ]
+        ],
+        "caption": "NREL 2024 ATB 技术基准。实际效率取决于系统和运行条件。",
+        "refs": [
+          "rte"
+        ]
+      }
+    ]
+  }
+}

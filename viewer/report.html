@@ -1,0 +1,239 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>iPollo 决策情报</title><style>:root{color-scheme:dark;--bg:#091018;--pane:#101a24;--soft:#13232d;--c:#86d8cd;--gold:#e6bb85;--ink:#e1ebe9;--muted:#9baeb7;--line:#293c48;--faint:#57717f;--field:#0a141d;--glow:#23515c44;--mono:ui-monospace,'SFMono-Regular',Menlo,monospace}
+body.light{color-scheme:light;--bg:#f4f4ee;--pane:#fffefa;--soft:#eaf0eb;--c:#176b64;--gold:#895b29;--ink:#172e39;--muted:#546b72;--line:#c4d3ce;--faint:#778f8b;--field:#f7faf5;--glow:#bddbd455}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif}button,select,.filebtn,textarea{font:inherit;color:inherit}button,.filebtn,select{cursor:pointer;border:1px solid var(--line);background:var(--pane);padding:6px 12px;border-radius:5px}button:hover,.filebtn:hover,select:hover{border-color:var(--c);color:var(--c)}button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}button:disabled{opacity:.42;cursor:default}header,.controls,.brand,.graphhead,.dlghead,.fileline{display:flex;align-items:center;gap:12px}header{height:68px;border-bottom:1px solid var(--line);justify-content:space-between;padding:0 28px}.brand{color:var(--c)}.brand b{font-size:19px;letter-spacing:.12em;color:var(--ink)}.brand span,.eyebrow,.fine,#inventory{font:10px/1.6 var(--mono);letter-spacing:.09em;color:var(--muted)}.brand span{padding-left:13px;border-left:1px solid var(--line)}.controls{gap:6px;font-size:12px}.controls select{max-width:240px}.shell{display:grid;grid-template-columns:195px minmax(0,1fr) 300px;min-height:calc(100vh - 68px)}nav,aside{background:var(--pane);padding:23px 16px;min-width:0}nav{border-right:1px solid var(--line)}aside{border-left:1px solid var(--line);max-height:calc(100vh - 68px);overflow:auto;position:sticky;top:0}.cap{border-bottom:1px solid var(--line);padding-bottom:15px;color:var(--c);display:flex;justify-content:space-between}.cap span{color:var(--faint)}nav>.eyebrow{margin:23px 9px 8px}nav button{width:100%;text-align:left;border:0;background:transparent}nav #overview{border:1px solid var(--line);font-size:13px}#nav button{display:flex;align-items:baseline;gap:10px;padding:10px 8px;line-height:1.45;border-bottom:1px solid var(--line);border-radius:0;font-size:12px}#nav button.active{color:var(--c);background:var(--soft)}#nav small{color:var(--faint);font:10px var(--mono)}#nav button span{flex:1}#inventory{margin:25px 8px}main{padding:20px clamp(15px,2.1vw,36px) 24px;min-width:0}.heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:19px 0}.heading h1{font-size:clamp(25px,2.5vw,40px);line-height:1.25;margin:5px 0;letter-spacing:-.02em}.heading p{font-size:13px;color:var(--muted);margin:6px 0}.heading #type{color:var(--c)}.heading button{flex:none;font-size:11px}#path{display:flex;align-items:center;gap:5px;flex-wrap:wrap;color:var(--faint);font-size:11px}#path button{border:0;padding:0;background:none;color:var(--muted)}#metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px;margin:0 0 17px}.metric{position:relative;text-align:left;border-top:2px solid var(--c);min-height:98px;padding:11px 12px;background:linear-gradient(120deg,var(--soft),var(--pane))}.metric.calc{border-top-color:var(--gold)}.metric strong{display:block;line-height:1.3;font-size:clamp(17px,1.55vw,25px);font-variant-numeric:tabular-nums}.metric span,.metric small{display:block;line-height:1.5;margin-top:4px;font-size:11px;color:var(--muted)}.metric small{font-size:9px;color:var(--faint)}.calc strong{color:var(--gold)}.graph{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--field)}.graphhead,.dlghead{justify-content:space-between}.graphhead{padding:12px 15px;border-bottom:1px solid var(--line);font-size:12px}.graphhead button{padding:4px 9px;font-size:11px}.graphhead button.active{background:var(--soft);color:var(--c);border-color:var(--c)}#graph{position:relative;background-image:radial-gradient(ellipse at center,var(--glow),transparent 65%),radial-gradient(var(--line) .7px,transparent .9px);background-size:auto,16px 16px}#graph svg{width:100%;display:block;min-height:265px}.wire{fill:none;stroke:var(--c);opacity:.42;stroke-width:1}.wire.trace{stroke-dasharray:1;stroke-dashoffset:1;animation:trace .64s ease-out forwards}.point{cursor:pointer;outline:0}.point rect{fill:var(--pane);stroke:var(--line)}.point:hover rect,.point:focus rect,.point.chosen rect{stroke:var(--c);fill:var(--soft)}svg text{fill:var(--ink);pointer-events:none}.minor{fill:var(--muted)}.mark{fill:var(--c)}.nodeReveal{animation:appear .42s both;animation-delay:var(--delay,0s)}.orb{fill:var(--soft);stroke:var(--c)}.ring{fill:none;stroke:var(--c);opacity:.25}.starlit{cursor:pointer;fill:var(--c);opacity:.55}.starlit:hover{opacity:1;stroke:var(--gold);stroke-width:3}.route{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:9px;border-bottom:1px solid var(--line);padding:12px 15px}.route button{font-size:12px}.route small{color:var(--gold);font-size:10px}.route p{grid-column:1/-1;font-size:12px;color:var(--muted);margin:0}.related button,.evidence button{display:block;text-align:left;margin:6px 0;width:100%;line-height:1.5;font-size:12px}.photo{position:relative;border:0;padding:0;overflow:hidden;width:100%;margin:12px 0 0;border-radius:4px}.photo img{width:100%;display:block;aspect-ratio:1.9;object-fit:cover}.photo span{position:absolute;right:6px;bottom:6px;color:white;background:#101a24b0;border-radius:3px;padding:1px 5px;font-size:10px}.photo-note{font-size:10px;color:var(--faint)}h3{font-size:20px;line-height:1.45;margin:14px 0 8px}aside p{font-size:13px;color:var(--muted)}.sub{font-size:11px;color:var(--c);letter-spacing:.06em;margin:19px 0 6px;border-top:1px solid var(--line);padding-top:12px}.source{border-left:2px solid var(--faint);padding-left:10px;margin:10px 0}.source small,.source p{display:block;color:var(--muted);font-size:11px}.source a,a{color:var(--c);text-decoration:none}.source a{font-size:13px}.tag{display:inline-block;font:10px var(--mono);color:var(--gold);margin-top:6px}.barline{display:grid;grid-template-columns:46px 1fr 44px;align-items:center;gap:6px;font-size:10px;margin:8px 0}.track{height:5px;background:var(--soft)}.track i{display:block;height:100%;background:var(--c)}.tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:15px}.tools button,.related button{font-size:11px}.focusIn{animation:appear .42s both}
+dialog{color:var(--ink);background:var(--pane);border:1px solid var(--line);border-radius:10px;padding:24px;width:min(640px,calc(100% - 24px));max-height:85vh;overflow:auto;box-shadow:0 30px 100px #0006}dialog::backdrop{background:#050b13a8;backdrop-filter:blur(4px)}dialog h2{font-size:25px;margin:12px 0}.dlghead button{padding:2px 9px}textarea{resize:vertical;width:100%;min-height:100px;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:12px}label input[type=file]{display:none}.fileline{margin:12px 0}.filebtn,.check{font-size:12px}.fine{letter-spacing:0;font-size:11px}.primary{background:var(--c);color:var(--bg);font-weight:650}.primary:hover{color:var(--bg)}#status{color:var(--gold);white-space:pre-line;font-size:12px}details{margin:16px 0;color:var(--muted);font-size:12px}summary{cursor:pointer}#figure{width:min(1000px,90vw)}#figure img{display:block;width:100%;margin-top:15px}.stage{display:flex;gap:8px;flex-wrap:wrap;font:11px var(--mono);color:var(--muted)}.stage i{font-style:normal;color:var(--c)}.fileline span{font-size:12px;color:var(--muted)}@keyframes trace{to{stroke-dashoffset:0}}@keyframes appear{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(min-width:1550px){.shell{grid-template-columns:226px minmax(0,1fr) 350px}}@media(max-width:1100px){.shell{grid-template-columns:145px minmax(0,1fr) 240px}main{padding:16px 12px}nav,aside{padding:16px 10px}#metrics{grid-template-columns:repeat(2,1fr)}.metric{min-height:70px;padding:6px 9px}}@media(max-width:790px){header{height:auto;padding:12px;flex-wrap:wrap}.brand span{display:none}.controls{gap:4px}.controls select{max-width:132px}.shell{display:flex;flex-direction:column}nav{display:flex;align-items:center;gap:6px;padding:7px 10px;overflow:auto;border:0;border-bottom:1px solid var(--line)}nav #overview{width:auto;white-space:nowrap}nav>.eyebrow,#inventory{display:none}#nav{display:flex}#nav button{width:auto;white-space:nowrap;border:0}aside{position:static;max-height:none;border-top:1px solid var(--line)}.photo{max-width:480px}main{padding-bottom:12px}.heading{margin:10px 0}.graphhead{padding:8px}#graph svg{min-height:220px}.heading h1{font-size:23px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;transition:none!important}.wire.trace{stroke-dashoffset:0}}
+.flow{padding:18px}.flow-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font:10px var(--mono)}.flow-top button{font-size:11px}.flow-path{display:grid;grid-template-columns:minmax(0,1fr) minmax(90px,.75fr) minmax(0,1fr);align-items:center;gap:0;padding:38px 0 24px}.relation-node{min-height:94px;display:grid;gap:5px;text-align:left;padding:14px;align-content:center;border-color:var(--c)}.relation-node small,.relation-node span{font:10px var(--mono);color:var(--muted)}.relation-node strong{font-size:17px}.conduit{text-align:center;color:var(--c);font-size:11px}.conduit i{display:block;height:1px;background:var(--c);position:relative;margin-top:6px}.conduit i::after{content:'›';position:absolute;right:0;top:-12px;font-size:16px}.explain{border-left:2px solid var(--gold);padding:0 12px}.explain small{color:var(--gold);font-size:10px}.explain p{margin:4px 0;color:var(--ink)}.linkindex{display:flex;flex-wrap:wrap;gap:5px;border-top:1px solid var(--line);padding-top:14px;margin-top:20px}.linkindex button{font-size:10px;text-align:left}.linkindex .active{color:var(--c);background:var(--soft)}@media(max-width:600px){.flow{padding:12px}.relation-node{padding:8px}.relation-node strong{font-size:14px}.flow-path{grid-template-columns:1fr 72px 1fr}.conduit{font-size:9px}}
+.stellar-wire{stroke:var(--c);fill:none;stroke-width:.65;opacity:.19;pointer-events:none}
+#find{font-size:12px;margin-top:6px;color:var(--muted)}#findText{width:100%;margin:12px 0;background:var(--bg);border:1px solid var(--line);color:var(--ink);font:inherit;padding:10px}#hits button{display:grid;gap:4px;text-align:left;width:100%;margin-top:5px}#hits small{color:var(--muted)}.presenting nav,.presenting .controls>:not(#present){display:none}.presenting .shell{grid-template-columns:minmax(0,1fr) minmax(240px,26%)}.presenting main{max-width:1250px;width:100%;justify-self:center}@media(max-width:790px){#find{white-space:nowrap;width:auto;margin:0}}
+/* Translucent presentation surfaces. Body ink stays opaque over both palettes. */
+:root{--bg:#111720;--pane:#1c2732;--field:#131d29;--soft:#233340;--ink:#e9f0f4;--muted:#acbdc8;--c:#a6dcd9;--line:#4155688a;--faint:#849aa9;--gold:#efc79c;--glass:rgba(34,46,60,.56);--glass-edge:rgba(192,218,240,.17);--shine:rgba(207,229,245,.065);--shadow:0 12px 44px rgba(1,6,14,.19);--plot0:#8fd0ce;--plot1:#a6b5f0;--plot2:#e2ba93;--plot3:#9fafc2;--negative:#d5959c}
+body.light{--bg:#dfe7e7;--pane:#f4f7f5;--field:#e3ebec;--soft:#e4edeb;--ink:#202e39;--muted:#4c606e;--c:#236862;--line:#7b939f54;--faint:#596e78;--glass:rgba(249,252,250,.53);--glass-edge:rgba(255,255,255,.80);--shine:rgba(255,255,255,.46);--shadow:0 10px 38px rgba(57,74,85,.095);--plot0:#357f82;--plot1:#7e80b6;--plot2:#ac773f;--plot3:#6b8491;--negative:#a44c63}
+body{isolation:isolate;background:var(--bg)}body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at -4% 56%,#466c7873,transparent 49%),radial-gradient(ellipse at 88% 18%,#5d537854,transparent 46%),radial-gradient(ellipse at 78% 110%,#22555d66,transparent 55%),linear-gradient(150deg,#111820 7%,#19232d 52%,#121b26 100%)}
+body.light:before{background:radial-gradient(ellipse at -5% 55%,#aeccca 0,transparent 52%),radial-gradient(ellipse at 90% 8%,#c1c4d1 0,transparent 49%),radial-gradient(ellipse at 80% 95%,#d4e4e1,transparent 50%),linear-gradient(140deg,#d4e0e1,#f4f4f0 59%,#dfe8eb)}
+header{height:60px;padding:0 24px;background:linear-gradient(110deg,var(--shine),transparent);border-color:var(--line)}
+.shell{grid-template-columns:clamp(146px,12.7vw,212px) minmax(0,1fr) clamp(245px,19.7vw,340px);gap:12px;padding:12px;min-height:calc(100vh - 60px)}
+nav,aside,dialog{background:linear-gradient(145deg,var(--shine),transparent 57%),var(--glass);border:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 var(--shine),var(--shadow);-webkit-backdrop-filter:blur(19px) saturate(1.17);backdrop-filter:blur(19px) saturate(1.17);border-radius:17px}
+nav,aside{position:sticky;top:12px;align-self:start;overflow:auto;max-height:calc(100dvh - 84px);padding:18px 12px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+dialog{background:linear-gradient(135deg,var(--shine),transparent),color-mix(in srgb,var(--pane) 81%,transparent);border-radius:21px;padding:25px}
+dialog::backdrop{background:#19252e47;backdrop-filter:blur(6px)}.light dialog::backdrop{background:#81939d3a}
+button,select,.filebtn{border-radius:8px;background:color-mix(in srgb,var(--pane) 71%,transparent)}nav button,#nav button{background:transparent}
+main{padding:6px 5px 14px}.heading{margin:12px 0 16px}.heading h1{font-size:clamp(24px,2.15vw,37px)}.heading #type{color:var(--muted)}
+#metrics{gap:9px;margin-bottom:14px}.metric{background:linear-gradient(133deg,var(--shine),transparent),var(--glass);border:1px solid var(--glass-edge);border-radius:13px;min-height:82px;box-shadow:0 4px 12px #10182809;padding:10px 14px}.metric:hover{border-color:var(--plot0)}.metric.calc:hover{border-color:var(--plot2)}.metric.calc{border-top-color:var(--glass-edge)}
+.graph{border-radius:17px;border:1px solid var(--glass-edge);background:linear-gradient(135deg,var(--shine),transparent),color-mix(in srgb,var(--field) 65%,transparent);box-shadow:inset 0 1px 0 var(--shine),var(--shadow)}
+.graphhead{padding:10px 15px}.graphhead>div{display:flex;gap:5px}.graphhead button{background:transparent}.graphhead b{font-weight:520}#graph{overflow:hidden;background-image:radial-gradient(ellipse at 47% 47%,var(--glow),transparent 68%),radial-gradient(var(--line) .55px,transparent .8px);background-size:auto,19px 19px}
+.survey-ring{fill:none;stroke:var(--faint);stroke-width:.65;opacity:.25;stroke-dasharray:1.5 8}.hub-aura{fill:var(--plot0);opacity:.045}.orb{fill:var(--pane);stroke:var(--c);stroke-opacity:.8}.point rect{fill:color-mix(in srgb,var(--pane) 92%,transparent);stroke:var(--faint);stroke-opacity:.48}.point:hover rect,.point:focus rect{stroke-opacity:1}.starlit{fill:var(--c);opacity:.84}.stellar-wire{opacity:.27}.wire.trace{animation-delay:var(--delay,0s)}.star-field{animation:arrive .7s both}.star-traces{animation:arrive .52s both}.ring{transform-box:fill-box;transform-origin:center;animation:orient 1s ease-out both}@keyframes orient{from{transform:rotate(-46deg);opacity:.04}to{transform:rotate(0);opacity:.38}}@keyframes arrive{from{opacity:0}to{opacity:1}}
+#graph .atlas-map{min-height:clamp(320px,48vh,690px)}
+.naventry{position:relative;padding-right:20px;border-bottom:1px solid var(--line)}#nav .naventry>button{border:0;min-height:38px}.subindex{margin:0}.subindex summary{position:absolute;right:0;top:5px;width:25px;height:30px;display:grid;place-items:center;list-style:none;cursor:pointer}.subindex summary::-webkit-details-marker{display:none}.subindex summary:after{content:'⌄';color:var(--muted);font-size:14px}.subindex[open] summary:after{transform:rotate(180deg)}
+#nav .subindex>div{border-left:1px solid var(--line);margin:0 0 8px 15px;padding-left:6px}#nav .subindex button{padding:4px 5px;border:0;color:var(--muted);font-size:11px;white-space:normal}#nav .subindex button:hover{color:var(--c)}
+.photo{border-radius:10px}.cap{padding-bottom:10px}.data-plate{margin:14px 0;padding:13px;border-radius:12px;background:linear-gradient(145deg,var(--shine),transparent),color-mix(in srgb,var(--pane) 48%,transparent);border:1px solid var(--glass-edge)}.plothead,.plotrow,.plotkey{display:flex;align-items:center;justify-content:space-between;gap:5px}.plothead{margin-bottom:10px}.plothead b{font-size:12px;font-weight:600}.plothead small,.plotnote,.plotrefs,.plotkey{color:var(--muted);font-size:10px}.plothead small{white-space:nowrap}.plotrow{display:grid;grid-template-columns:1fr auto;font-size:11px;gap:3px;margin:9px 0}.plotrow strong{font:11px var(--mono);color:var(--ink)}.plottrack{grid-column:1/-1;height:5px;background:var(--line);position:relative;border-radius:5px}.plotfill,.zero{position:absolute;height:100%;border-radius:3px}.zero{width:1px;top:-2px;height:9px;background:var(--faint)}.plotfill{transform-origin:left;animation:fillPlot .48s ease-out both}@keyframes fillPlot{from{transform:scaleX(.02)}}
+.donutbox{display:grid;grid-template-columns:39% 1fr;align-items:center;gap:8px}.donutbox svg,.slope{width:100%;display:block}.plotkey{justify-content:start;gap:6px;line-height:1.6;margin:3px 0}.plotkey i{width:6px;height:6px;border-radius:50%;flex:none}.plotkey span{flex:1}.plotkey b{color:var(--ink);font-family:var(--mono);font-weight:500}.axis{stroke:var(--line);fill:none}.trend{stroke:var(--plot0);fill:none;stroke-width:2.4;stroke-dasharray:4 4}aside .plotnote{line-height:1.55;font-size:10px;margin:10px 0 0;color:var(--muted)}.plotrefs{margin:7px 0 0}.plotrefs button{width:100%;text-align:left;font-size:10px;margin-top:4px}.focusIn{animation:dossierSlide .45s cubic-bezier(.2,.7,.2,1)}@keyframes dossierSlide{from{opacity:.2;transform:translateX(8px)}to{opacity:1;transform:none}}
+body.wide-map{overflow:hidden}.wide-map .graph{position:fixed;inset:12px;z-index:10;display:flex;flex-direction:column;background:linear-gradient(125deg,var(--shine),transparent),var(--field);margin:0}.wide-map #graph{flex:1;min-height:0;overflow:auto}.wide-map #graph .atlas-map{width:100%;height:100%;min-height:0}.wide-map .graphhead{padding:16px 22px}
+@media(max-width:980px){.shell{grid-template-columns:138px minmax(0,1fr) 215px;gap:7px;padding:7px}nav,aside{padding:11px 9px}.graphhead{padding:8px;flex-wrap:wrap}.metric{padding:8px}.subindex summary{width:22px}.data-plate{padding:9px}}
+@media(max-width:790px){header{height:auto}.shell{padding:9px;gap:8px}.shell nav,.shell aside{position:static;max-height:none}.shell nav{padding:7px;overflow:auto;align-self:stretch}.shell aside{align-self:stretch}.naventry{padding-right:0;border:0}.subindex{display:none}.graphhead button{font-size:10px;padding:4px 6px}#graph .atlas-map{min-height:225px}.wide-map .graph{inset:5px}.data-plate{max-width:550px}.metric{min-height:66px}.plotkey{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.ring,.star-field,.star-traces,.plotfill,.focusIn{animation:none!important}}
+.map-shortcuts{display:flex;align-items:center;gap:10px;padding:7px 13px;border-top:1px solid var(--line);background:var(--glass);font-size:11px}.map-shortcuts label{display:flex;align-items:center;gap:6px;color:var(--muted);white-space:nowrap;font-size:10px}.map-shortcuts select{max-width:112px;background:transparent;padding:2px 4px;font-size:11px}.shortcut-items{display:flex;gap:5px;overflow-x:auto;scrollbar-width:thin}.shortcut-items button{background:transparent;white-space:nowrap;font-size:10px;padding:3px 6px}.wide-map #graph:has(.map-shortcuts){display:flex;flex-direction:column}.wide-map #graph:has(.map-shortcuts) svg{flex:1;min-height:0;height:0}.map-shortcuts select option{background:var(--pane);color:var(--ink)}@media(max-width:650px){.map-shortcuts{gap:5px;padding:6px}.map-shortcuts select{max-width:85px}}
+</style>
+<body><header><div class="brand"><svg width="31" height="31" viewBox="0 0 36 36" aria-hidden="true"><path d="M4 27 18 4l14 23-14-7z M4 27l14-7V4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg><b>iPollo 决策情报</b><span>DECISION INTELLIGENCE</span></div><div class="controls"><select hidden id="projects" aria-label="选择讲解主题"></select><button id="theme" title="切换明暗主题">浅色</button><button id="present">讲解模式</button></div></header>
+<div class="shell"><nav><button id="overview">◎　主题全景</button><button id="find">⌕　检索节点</button><div class="eyebrow">讲解目录</div><div id="nav"></div><div id="inventory"></div></nav>
+<main><div id="path"></div><section class="heading"><div><div class="eyebrow" id="type"></div><h1 id="title"></h1><p id="question"></p></div><button id="back" title="返回上一视图">← 返回</button></section>
+<section id="metrics" aria-label="当前层核心指标"></section><section class="graph"><div class="graphhead"><b id="graphTitle"></b><div><button id="mapMode">全部节点</button><button id="relations">关系链</button> <button id="wideView" title="展开图面 · Esc 收起" aria-pressed="false">⤢ 放大图面</button></div></div><div id="graph" role="region" aria-label="可点击的关系图"></div></section>
+</main><aside><div class="eyebrow cap">节点档案 <span>FIELD NOTES</span></div><div id="dossier"></div></aside></div>
+
+<dialog id="finder"><form method="dialog" class="dlghead"><b>查找节点、数据或来源</b><button aria-label="关闭">×</button></form><input id="findText" aria-label="搜索" placeholder="例如：经营现金、全球办公、JLL"><div id="hits"></div></dialog><dialog id="figure"><form method="dialog" class="dlghead"><b id="figtitle"></b><button aria-label="关闭图片">×</button></form><img id="figimg" alt=""></dialog>
+<script id="initial" type="application/json">/*CASE*/</script><script>'use strict';
+const el=id=>document.getElementById(id);
+const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sourceURL=value=>/^https?:\/\//i.test(String(value))?value:'';
+const nameOf=n=>n.label.replace(/^0[1-9]\s+/,'');
+const initial=JSON.parse(el('initial').textContent), registry=new Map([[initial.key,initial]]);
+let project, index, parents, scope, selected, mode='local', history=[], context=null, files=[], candidate=null, token='',busy=false;
+function ancestry(n){const list=[];while(n){list.unshift(n);n=parents.get(n.id)}return list}
+function flatten(n){const a=[n];for(const c of n.children||[])a.push(...flatten(c));return a}
+function setProject(p){
+ project=p;index=new Map();parents=new Map();
+ function visit(n,parent){index.set(n.id,n);parents.set(n.id,parent);for(const c of n.children||[])visit(c,n)}visit(p.tree,null);
+ scope=p.tree;selected=scope;history=[];mode='all';
+ el('projects').innerHTML=[...registry].map(([id,v])=>'<option value="'+escapeHTML(id)+'">'+escapeHTML(v.title)+'</option>').join('');
+ el('projects').value=p.key;render();
+}
+function remember(){history.push([scope.id,selected.id,mode,linkStep]);if(history.length>90)history.shift()}
+function go(id,keepScope=false){if(document.body.classList.contains('wide-map'))setWideMap(false);const n=index.get(id);if(!n)return;remember();if(!keepScope)scope=n.children?.length?n:parents.get(id)||n;selected=n;mode='local';render();if(innerWidth<790&&!n.children?.length)el('dossier').scrollIntoView({block:'start'})}
+function metricList(n){
+ if(project.highlights?.[n.id]?.length)return project.highlights[n.id];
+ const found=[];for(const c of flatten(n)){if(c.metric&&c.refs?.length)found.push({ref:c.id,value:c.metric,label:c.metric_label||c.label,kind:c.kind})}
+ return found.slice(0,4)
+}
+function evidenceOf(n){return (n.refs||[]).map(k=>project.sources[k]).filter(Boolean)}
+function chartPanel(spec){
+ const rows=spec.rows||[];
+ if(!rows.length||rows.some(r=>!Array.isArray(r)||!Number.isFinite(r[1])))return '';
+ const fmt=v=>v.toLocaleString('zh-CN',{maximumFractionDigits:3}),unit=escapeHTML(spec.unit||''),points=rows.map(r=>r[1]),total=points.reduce((sum,v)=>sum+v,0);
+ const tone=i=>'var(--plot'+(i%4)+')';
+ let body='';
+ if(spec.kind==='ring'&&total>0&&points.every(v=>v>=0)){
+  let offset=0;const segments=rows.map(([label,v],i)=>{const share=v/total*100;
+   const circle='<circle cx="53" cy="53" r="40" pathLength="100" fill="none" stroke="'+tone(i)+'" stroke-width="9" stroke-dasharray="'+Math.max(0,share-.7)+' 100" stroke-dashoffset="'+(-offset)+'" transform="rotate(-90 53 53)"/>';offset+=share;return circle});
+  body='<div class="donutbox"><svg viewBox="0 0 106 106" aria-hidden="true">'+segments.join('')+'<text x="53" y="52" text-anchor="middle" font-size="17">'+fmt(total)+'</text><text x="53" y="67" text-anchor="middle" class="minor" font-size="9">'+unit+'</text></svg><div>'+rows.map(([label,v],i)=>'<div class="plotkey"><i style="background:'+tone(i)+'"></i><span>'+escapeHTML(label)+'</span><b>'+fmt(v)+'</b></div>').join('')+'</div></div>'
+ }else if(spec.kind==='slope'&&rows.length===2){
+  const max=Math.max(1,...points)*1.14;const y=v=>78-v/max*60;
+  body='<svg viewBox="0 0 256 94" class="slope" role="img" aria-label="'+escapeHTML(rows.map(r=>r[0]+' '+r[1]+spec.unit).join('，'))+'"><path d="M30 78H226" class="axis"/><path d="M30 '+y(points[0])+' L226 '+y(points[1])+'" class="trend"/>'+rows.map(([label,v],i)=>{let x=i?226:30;return '<circle cx="'+x+'" cy="'+y(v)+'" r="4" fill="'+tone(i)+'"/><text x="'+(i?242:14)+'" y="'+(y(v)-9)+'" text-anchor="'+(i?'end':'start')+'" font-size="13">'+fmt(v)+'</text><text x="'+(i?242:14)+'" y="92" text-anchor="'+(i?'end':'start')+'" class="minor" font-size="10">'+escapeHTML(label)+'</text>'}).join('')+'</svg>'
+ }else{
+  const hi=spec.unit==='%'&&points.every(v=>v>=0&&v<=100)?100:Math.max(0,...points);
+  const lo=Math.min(0,...points),span=hi-lo||1,zero=-lo/span*100;
+  body=rows.map(([label,v],i)=>'<div class="plotrow"><span>'+escapeHTML(label)+'</span><strong>'+fmt(v)+'</strong><div class="plottrack"><i class="zero" style="left:'+zero+'%"></i><i class="plotfill" style="left:'+Math.min(zero,(v-lo)/span*100)+'%;width:'+Math.abs(v)/span*100+'%;background:'+(v<0?'var(--negative)':tone(i))+'"></i></div></div>').join('')
+ }
+ return '<section class="data-plate"><div class="plothead"><b>'+escapeHTML(spec.title)+'</b><small>'+unit+'</small></div>'+body+'<p class="plotnote">'+escapeHTML(spec.caption||'')+'</p>'+((spec.refs||[]).length?'<details class="plotrefs"><summary>查看数据依据</summary>'+spec.refs.filter(id=>index.has(id)).map(id=>'<button data-id="'+escapeHTML(id)+'">'+escapeHTML(nameOf(index.get(id)))+' ↗</button>').join('')+'</details>':'')+'</section>'
+}
+function dossierPlots(n){
+ const legacy=project.charts?.[n.id],specs=[...(project.panels?.[n.id]||[])];
+ if(legacy)specs.unshift({kind:'bars',title:legacy.title,unit:legacy.rows[0][2],rows:legacy.rows.map(r=>r.slice(0,2)),caption:legacy.caption,refs:legacy.refs});
+ if(!specs.length&&n.children?.length){
+  const counts=new Map();for(const c of flatten(n)){if(c.children?.length)continue;const key=c.kind||'条目';counts.set(key,(counts.get(key)||0)+1)}
+  if(counts.size>1)specs.push({kind:'ring',title:'本分支的证据构成',unit:'个节点',rows:[...counts],caption:'按节点类型计数，每个末级条目计一次。'})
+ }
+ return specs.map(chartPanel).join('')
+}
+function routeList(n){return (project.links||[]).filter(l=>l.start===n.id||l.end===n.id)}
+function svgText(x,y,s,cl='',size=13){return '<text x="'+x+'" y="'+y+'" font-size="'+size+'" class="'+cl+'">'+escapeHTML(s)+'</text>'}
+function pieces(text,width){const chars=[...text],lines=[];let s='',len=0;for(const c of chars){let w=c.charCodeAt(0)>255?1:.58;if(len+w>width){lines.push(s);s='';len=0}s+=c;len+=w}if(s)lines.push(s);return lines}
+let linkStep=0;
+function drawGraph(){
+ const area=el('graph'), active=scope.children||[], all=mode==='all';
+ el('relations').classList.toggle('active',mode==='links');el('mapMode').classList.toggle('active',all);
+ el('mapMode').textContent=all?'当前层级':'全部节点';el('relations').textContent=mode==='links'?'返回图谱':'关系链';
+ if(mode==='links'){
+  const subtree=new Set(flatten(scope).map(n=>n.id));
+  const links=(project.links||[]).filter(l=>subtree.has(l.start)||subtree.has(l.end));
+  el('graphTitle').textContent='因素之间如何传导';
+  if(!links.length){area.innerHTML='<article class="route"><p>本层记录的是资料归属。当前分支暂无已记录的传导路径。</p></article>';return}
+  linkStep=Math.max(0,Math.min(linkStep,links.length-1));
+  const l=links[linkStep],left=index.get(l.start),right=index.get(l.end);
+  const endpoint=(node,label)=>'<button class="relation-node" data-id="'+escapeHTML(node.id)+'"><small>'+label+'</small><strong>'+escapeHTML(nameOf(node))+'</strong><span>展开节点 ↗</span></button>';
+  area.innerHTML='<div class="flow"><div class="flow-top"><span>传导关系　'+String(linkStep+1).padStart(2,'0')+' / '+String(links.length).padStart(2,'0')+'</span><div><button id="prevLink" '+(!linkStep?'disabled':'')+'>←</button> <button id="nextLink" '+(linkStep===links.length-1?'disabled':'')+'>下一条 →</button></div></div><div class="flow-path nodeReveal">'+endpoint(left,'起点')+'<div class="conduit"><span>'+escapeHTML(l.label)+'</span><i></i></div>'+endpoint(right,'作用对象')+'</div><div class="explain"><small>'+escapeHTML(l.status)+'</small><p>'+escapeHTML(l.reason)+'</p></div><div class="linkindex">'+links.map((item,i)=>'<button data-step="'+i+'" class="'+(linkStep===i?'active':'')+'">'+escapeHTML(nameOf(index.get(item.start)))+' → '+escapeHTML(nameOf(index.get(item.end)))+'</button>').join('')+'</div></div>';
+  const support=document.createElement('div');support.className='tools';
+  for(const [role,n] of [['起点依据',left],['作用对象依据',right]]){
+   const leaf=flatten(n).find(v=>v.refs?.length)||flatten(n).find(v=>v.note&&v.kind==='推演');if(!leaf)continue;
+   const button=document.createElement('button');button.dataset.id=leaf.id;
+   button.textContent=role+' · '+(evidenceOf(leaf)[0]?.org||'情景算式')+' ↗';support.append(button)
+  }
+  area.querySelector('.explain').append(support);
+  el('prevLink').onclick=()=>{linkStep--;drawGraph()};el('nextLink').onclick=()=>{linkStep++;drawGraph()};
+  area.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{linkStep=Number(b.dataset.step);drawGraph()});
+  return
+ }
+ const count=flatten(scope).length;
+ el('graphTitle').textContent=(all?'全景':'当前关系')+' · '+count+' 个节点';
+ paintNetwork(area,scope,all);
+}
+// Radial overview and a two-sided local tree share a stable node identity.
+function paintNetwork(area,center,all){
+ const list=center.children||[],radial=all&&list.length>=3&&list.length<=14;
+ const W=1060,H=radial?550:Math.max(315,Math.ceil(list.length/2)*91+80),cx=W/2,cy=H/2;
+ const leafSizes=new Map();function size(n){const total=n.children?.length?n.children.reduce((v,c)=>v+size(c),0):1;leafSizes.set(n,total);return total}size(center);
+ const coords=list.map((n,i)=>{
+  const theta=-Math.PI*.875+i*Math.PI*2/list.length,side=i%2===0?-1:1;
+  return {n,i,theta,x:radial?cx+Math.cos(theta)*274:cx+side*280,y:radial?cy+Math.sin(theta)*145:cy+(Math.floor(i/2)-(Math.ceil(list.length/2)-1)/2)*91}
+ });
+ const branches=[],dots=[],wires=[],cards=[];
+ for(const {n,i,theta,x,y} of coords){
+  let cursor=0;const half=radial?Math.PI/list.length*.98:.0,subrows=n.children?.length||0;
+  function descend(child,px,py,depth){
+   const total=leafSizes.get(child),t=(cursor+total*.5)/leafSizes.get(n),phi=theta+(t*2-1)*half;
+   const inner=!!child.children?.length;
+   const r=inner?Math.min(.94,.62+depth*.095):.935+.050*Math.sin((cursor+i)*1.73);
+   // In the branch view descendants sit beyond their parent, in the same row.
+   const xx=radial?cx+Math.cos(phi)*(W/2-16)*r:x+(x<cx?-1:1)*(inner?110+depth*17:185+(cursor%6)*6);
+   const yy=radial?cy+Math.sin(phi)*(H/2-12)*r:y+(t-.5)*(list.length>2?74:148);
+   wires.push('<path class="stellar-wire" d="M '+px+' '+py+' Q '+((px+xx)/2)+' '+(py*.37+yy*.63)+' '+xx+' '+yy+'"/>');
+   const id=escapeHTML(child.id),tip=escapeHTML(nameOf(child)),rr=inner?(depth===1?3.1:2.2):1.65;
+   dots.push('<circle class="starlit" data-id="'+id+'" cx="'+xx+'" cy="'+yy+'" r="'+rr+'"><title>'+tip+'</title></circle>');
+   if(inner)child.children.forEach(c=>descend(c,xx,yy,depth+1));else cursor++
+  }
+  if(subrows)n.children.forEach(c=>descend(c,x,y,1));
+  branches.push('<path class="wire trace" style="--delay:'+i*.022+'s" pathLength="1" d="M '+cx+' '+cy+' Q '+(cx+(x-cx)*.62)+' '+(cy+(y-cy)*.30)+' '+x+' '+y+'"/>');
+  const w=radial?156:210,h=radial?45:62,lines=pieces(nameOf(n),radial?10:14);
+  const label=radial?(lines[0]+(lines.length>1?'…':'')):lines[0];
+  cards.push('<g class="point nodeReveal '+(selected===n?'chosen':'')+'" role="button" tabindex="0" aria-label="'+escapeHTML(n.label)+'" data-id="'+escapeHTML(n.id)+'" style="--delay:'+Math.min(.26,i*.033)+'s"><title>'+escapeHTML(nameOf(n))+'</title><rect x="'+(x-w/2)+'" y="'+(y-h/2)+'" width="'+w+'" height="'+h+'" rx="8"/>'+svgText(x-w/2+12,y-(radial?7:12),n.children?.length?(n.role||'分支')+'  /  '+n.children.length:(n.kind||'证据'),'minor',9)+svgText(x-w/2+12,y+10,label,'',radial?14:15)+(!radial&&lines[1]?svgText(x-w/2+12,y+24,lines[1]+(lines[2]?'…':''),'minor',11):'')+'</g>')
+ }
+ let rings='';if(radial)for(const [rx,ry] of [[112,67],[224,121],[356,190],[492,246]])rings+='<ellipse class="survey-ring" cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'"/>';
+ const mid=pieces(nameOf(center),9),hub='<g class="hub"><circle class="hub-aura" cx="'+cx+'" cy="'+cy+'" r="91"/><circle class="ring" cx="'+cx+'" cy="'+cy+'" r="76" stroke-dasharray="2 7"/><circle class="orb" cx="'+cx+'" cy="'+cy+'" r="62"/><g text-anchor="middle">'+svgText(cx,cy-16,'CURRENT FOCUS','mark',8)+svgText(cx,cy+7,mid[0]||'','',16)+svgText(cx,cy+26,mid[1]||'','minor',11)+'</g></g>';
+ area.innerHTML='<svg class="atlas-map" viewBox="0 0 '+W+' '+H+'" aria-label="主题及关联节点">'+rings+'<g class="star-traces">'+wires.join('')+'</g><g class="star-field">'+dots.join('')+'</g>'+branches.join('')+cards.join('')+hub+'</svg>';
+ const groups=list.filter(n=>n.children?.length);
+ if(all&&center===project.tree&&groups.length){
+  const shortcuts=document.createElement('div');shortcuts.className='map-shortcuts';
+  shortcuts.innerHTML='<label>二级入口 <select aria-label="选择二级入口所属分支">'+groups.map(n=>'<option value="'+escapeHTML(n.id)+'">'+escapeHTML(nameOf(n))+'</option>').join('')+'</select></label><div class="shortcut-items"></div>';
+  area.append(shortcuts);
+  const chooser=shortcuts.querySelector('select'),items=shortcuts.querySelector('.shortcut-items');
+  function choose(n){chooser.value=n.id;items.innerHTML=n.children.map(c=>'<button data-id="'+escapeHTML(c.id)+'">'+escapeHTML(nameOf(c))+' ↗</button>').join('')}
+  chooser.onchange=()=>choose(index.get(chooser.value));choose(groups[0]);
+  for(const card of area.querySelectorAll('.point')){
+   const n=index.get(card.dataset.id);if(!n?.children?.length)continue;
+   card.addEventListener('pointerenter',()=>choose(n));card.addEventListener('focus',()=>choose(n))
+  }
+ }
+ const svg=area.firstElementChild;svg.style.transformOrigin=mapOrigin;mapOrigin='50% 50%';
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)svg.animate([{opacity:.10,transform:'scale(.90)'},{opacity:1,transform:'scale(1)'}],{duration:550,easing:'cubic-bezier(.18,.74,.2,1)'})
+}
+let mapOrigin='50% 50%';
+
+function showDossier(){
+ const n=selected,refs=evidenceOf(n),a=ancestry(n);
+ const photo=[...a].reverse().map(v=>project.photos?.[v.id]).find(Boolean);
+ const route=routeList(n),alias=metricList(scope).find(m=>m.ref===n.id),heading=alias?alias.value+'｜'+alias.label:nameOf(n);
+ let html=(photo?'<button class="photo" id="photo"><img alt="'+escapeHTML(photo.caption)+'" src="'+escapeHTML(photo.url)+'"><span>⤢</span></button><div class="photo-note">'+escapeHTML(photo.caption)+'</div>':'')+'<span class="tag">'+escapeHTML(n.kind||n.role||'主题')+'</span><h3>'+escapeHTML(heading)+'</h3>';
+ html+='<p>'+escapeHTML(n.note||n.finding||(n===project.tree?project.question:n.children?.length?'本层包含 '+n.children.length+' 个分支，选择一个分支继续讲解。':refs[0]?.scope||'该条目按项目方案记录。'))+'</p>';
+ if(n.mechanism)html+='<div class="sub">传导机制</div><p>'+escapeHTML(n.mechanism)+'</p>';
+ if(n.gap)html+='<div class="sub">待验证</div><p>'+escapeHTML(n.gap)+'</p>';
+ html+=dossierPlots(n);
+ if(refs.length)html+='<div class="sub">来源与统计口径</div>'+refs.map(s=>'<div class="source"><small>'+escapeHTML([s.org,s.date].filter(Boolean).join(' · '))+'</small>'+(sourceURL(s.url)?'<a target="_blank" rel="noopener noreferrer" href="'+escapeHTML(s.url)+'">'+escapeHTML(s.title)+' ↗</a>':'<b>'+escapeHTML(s.title)+'</b>')+'<p>'+escapeHTML(s.scope||'')+'</p></div>').join('');
+ const fig=project.figures?.[n.id];if(fig&&sourceURL(fig.url)&&sourceURL(fig.image))html+='<div class="sub">'+escapeHTML(fig.title)+'</div><a href="'+escapeHTML(fig.url)+'" target="_blank" rel="noopener"><img loading="lazy" alt="查看来源原图 ↗" style="width:100%" src="'+escapeHTML(fig.image)+'"></a>';
+ if(route.length)html+='<div class="sub">关联因子</div><div class="related">'+route.map(l=>{const outgoing=l.start===n.id, target=index.get(outgoing?l.end:l.start);return '<button data-id="'+escapeHTML(target.id)+'">'+(outgoing?'→ ':'← ')+escapeHTML(nameOf(target))+'<br><small>'+escapeHTML(l.label+' · '+l.status)+'</small></button>'}).join('')+'</div>';
+ if(!refs.length&&n.children?.length){const samples=flatten(n).filter(v=>v!==n&&evidenceOf(v).length).slice(0,2);if(samples.length)html+='<div class="sub">可追溯证据</div><div class="related">'+samples.map(v=>'<button data-id="'+escapeHTML(v.id)+'">'+escapeHTML(nameOf(v))+' ↗</button>').join('')+'</div>'}
+ const host=el('dossier');host.innerHTML=html;host.classList.remove('focusIn');void host.offsetWidth;host.classList.add('focusIn');
+ if(photo)el('photo').onclick=()=>{el('figtitle').textContent=photo.caption;el('figimg').src=photo.url;el('figimg').alt=photo.caption;el('figure').showModal()}
+}
+function render(){
+ const trail=ancestry(scope),main=scope===project.tree;
+ el('path').innerHTML=trail.map(n=>'<button data-id="'+escapeHTML(n.id)+'">'+escapeHTML(nameOf(n))+'</button>').join('　/　');
+ el('type').textContent=main?'主题全景':'第 '+(trail.length-1)+' 层 · '+(scope.role||'关系分支');
+ el('title').textContent=main?project.title:nameOf(scope);el('question').textContent=main?project.question:scope.finding||scope.note||trail.map(nameOf).join('　›　');
+ el('back').disabled=!history.length;
+ el('nav').innerHTML=(scope.children||[]).map((n,i)=>{
+  const title='<button data-id="'+escapeHTML(n.id)+'" class="'+(n===selected?'active':'')+'"><small>'+String(i+1).padStart(2,'0')+'</small><span>'+escapeHTML(nameOf(n))+'</span></button>';
+  if(!n.children?.length||!main)return title;
+  const options=n.children.map(c=>'<button data-id="'+escapeHTML(c.id)+'">'+escapeHTML(nameOf(c))+'</button>').join('');
+  return '<div class="naventry">'+title+'<details class="subindex" '+(i===0?'open':'')+'><summary aria-label="展开或收起'+escapeHTML(nameOf(n))+'的二级分支"></summary><div>'+options+'</div></details></div>'
+ }).join('');
+
+ el('inventory').textContent=index.size+' 个节点 / '+Object.keys(project.sources||{}).length+' 个来源';
+ const metrics=metricList(scope);el('metrics').innerHTML=metrics.map(m=>{const n=index.get(m.ref),s=n&&evidenceOf(n)[0];return '<button class="metric '+(m.kind==='推演'?'calc':'')+'" data-metric="'+escapeHTML(m.ref)+'"><strong>'+escapeHTML(m.value)+'</strong><span>'+escapeHTML(m.label)+'</span><small>'+escapeHTML([s?.org,s?.date].filter(Boolean).join(' · ')||m.kind||'调查指标')+'</small></button>'}).join('');
+ if(!metrics.length){el('metrics').innerHTML=['分支数','有出处的节点','待验证问题'].map((s,i)=>'<div class="metric"><strong>'+[scope.children?.length||0,flatten(scope).filter(n=>n.refs?.length).length,flatten(scope).filter(n=>n.gap||n.kind==='待验证').length][i]+'</strong><span>'+s+'</span><small>图谱结构统计</small></div>').join('')}
+ showDossier();drawGraph();
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-id],[data-metric],[data-task]');if(!b)return;if(b.closest('#graph')){const rect=el('graph').getBoundingClientRect();if(e.detail)mapOrigin=(100*(e.clientX-rect.left)/rect.width)+'% '+(100*(e.clientY-rect.top)/rect.height)+'%'}go(b.dataset.id||b.dataset.metric,!!b.dataset.metric)});
+el('graph').addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.dataset.id){e.preventDefault();go(e.target.dataset.id)}});
+el('back').onclick=()=>{const prior=history.pop();if(!prior)return;scope=index.get(prior[0]);selected=index.get(prior[1]);mode=prior[2];linkStep=prior[3];render()};
+el('overview').onclick=()=>{remember();scope=project.tree;selected=scope;mode='all';render()};el('projects').onchange=e=>setProject(registry.get(e.target.value));
+function setWideMap(on){document.body.classList.toggle('wide-map',on);el('wideView').setAttribute('aria-pressed',String(on));el('wideView').textContent=on?'⤡ 收起图面':'⤢ 放大图面'}
+el('wideView').onclick=()=>setWideMap(!document.body.classList.contains('wide-map'));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.querySelector('dialog[open]')&&document.body.classList.contains('wide-map'))setWideMap(false)});
+el('mapMode').onclick=()=>{remember();mode=mode==='all'?'local':'all';drawGraph();el('back').disabled=false};
+el('relations').onclick=()=>{remember();linkStep=0;mode=mode==='links'?'local':'links';drawGraph();el('back').disabled=false};
+function applyTheme(light){document.body.classList.toggle('light',light);el('theme').textContent=light?'深色':'浅色'}
+function findNodes(){
+ const q=el('findText').value.trim().toLowerCase();
+ const results=q?[...index.values()].filter(n=>[n.label,n.finding,n.note,...evidenceOf(n).map(s=>s.org)].filter(Boolean).join(' ').toLowerCase().includes(q)):project.tree.children||[];
+ el('hits').innerHTML=results.slice(0,35).map(n=>'<button data-hit="'+escapeHTML(n.id)+'"><strong>'+escapeHTML(nameOf(n))+'</strong><small>'+escapeHTML(ancestry(n).slice(0,-1).map(nameOf).join(' › '))+'</small></button>').join('')||'<p>没有匹配的节点。</p>';
+ el('hits').querySelectorAll('[data-hit]').forEach(b=>b.onclick=()=>{el('finder').close();go(b.dataset.hit)})
+}
+el('find').onclick=()=>{el('findText').value='';findNodes();el('finder').showModal();el('findText').focus()};el('findText').oninput=findNodes;
+el('present').onclick=()=>{const on=document.body.classList.toggle('presenting');el('present').textContent=on?'退出讲解':'讲解模式'};
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&document.body.classList.contains('presenting'))el('present').click();
+ if(e.target.closest('input,textarea,select,dialog')||document.querySelector('dialog[open]'))return;
+ if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();el('find').click()}
+ if(mode==='links'&&['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();el(e.key==='ArrowLeft'?'prevLink':'nextLink')?.click()}
+});
+applyTheme(matchMedia('(prefers-color-scheme: light)').matches);el('theme').onclick=()=>applyTheme(!document.body.classList.contains('light'));
+setProject(initial);</script></body></html>
