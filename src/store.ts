@@ -20,12 +20,32 @@ export async function openStore(service:IpolloData,workspace:string) {
   try{await ready}catch(error){byApp.delete(app.id);throw error}
   return app;
 }
-export const queueReport=(app:DataApp,title:string,session='')=>app.collection('reports').insert({title,state:'pending',session,count:0,digest:''});
-export async function saveReport(app:DataApp,row:DataRecord,raw:unknown) {
-  const report=parseReport(raw), payload=JSON.stringify(report), digest=createHash('sha256').update(payload).digest('hex');
-  if(row.state==='ready' && row.digest===digest) return row.id;
-  if(row.state!=='pending') throw Error('该版本已经结束，请创建新版本');
+const saves=new Map<string,Promise<unknown>>();
+
+export async function saveSessionReport(app:DataApp,session:string,raw:unknown) {
+  const report=parseReport(raw);
+  const payload=JSON.stringify(report);
   if(payload.length>1200000) throw Error('图谱过大，请缩减嵌入图片');
+  const digest=createHash('sha256').update(payload).digest('hex');
+  const key=app.id+':'+session;
+  const previous=saves.get(key);
+  const current=(async()=>{
+    await previous?.catch(()=>{});
+    const reports=app.collection('reports');
+    const exact=await reports.find({where:{session,state:'ready',digest},limit:1});
+    if(exact.items[0]) return exact.items[0].id;
+
+    // Reuse unfinished reservations from earlier releases and safely retry a failed data write.
+    const pending=await reports.find({where:{session,state:'pending'},sort:'-createdAt',limit:1});
+    const row=pending.items[0] ?? await reports.insert({title:report.title,state:'pending',session,count:0,digest:''});
+    return saveReport(app,row,report,payload,digest);
+  })();
+  saves.set(key,current);
+  try {return await current}
+  finally {if(saves.get(key)===current)saves.delete(key)}
+}
+
+async function saveReport(app:DataApp,row:DataRecord,report:Report,payload:string,digest:string) {
   // Bound by UTF-16 length so even quotes or non-ASCII characters fit a 16 KiB data record.
   const chunks=[];
   for(let offset=0;offset<payload.length;) {

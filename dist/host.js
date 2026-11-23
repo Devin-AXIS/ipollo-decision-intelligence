@@ -8,7 +8,6 @@ var __export = (target, all) => {
 import { defineTool } from "@deepseek-ai/dsh-tools";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
 
 // src/store.ts
 import { createHash } from "node:crypto";
@@ -19820,12 +19819,32 @@ async function openStore(service, workspace) {
   }
   return app;
 }
-var queueReport = (app, title, session = "") => app.collection("reports").insert({ title, state: "pending", session, count: 0, digest: "" });
-async function saveReport(app, row, raw) {
-  const report = parseReport(raw), payload = JSON.stringify(report), digest = createHash("sha256").update(payload).digest("hex");
-  if (row.state === "ready" && row.digest === digest) return row.id;
-  if (row.state !== "pending") throw Error("\u8BE5\u7248\u672C\u5DF2\u7ECF\u7ED3\u675F\uFF0C\u8BF7\u521B\u5EFA\u65B0\u7248\u672C");
+var saves = /* @__PURE__ */ new Map();
+async function saveSessionReport(app, session, raw) {
+  const report = parseReport(raw);
+  const payload = JSON.stringify(report);
   if (payload.length > 12e5) throw Error("\u56FE\u8C31\u8FC7\u5927\uFF0C\u8BF7\u7F29\u51CF\u5D4C\u5165\u56FE\u7247");
+  const digest = createHash("sha256").update(payload).digest("hex");
+  const key2 = app.id + ":" + session;
+  const previous = saves.get(key2);
+  const current = (async () => {
+    await previous?.catch(() => {
+    });
+    const reports = app.collection("reports");
+    const exact = await reports.find({ where: { session, state: "ready", digest }, limit: 1 });
+    if (exact.items[0]) return exact.items[0].id;
+    const pending = await reports.find({ where: { session, state: "pending" }, sort: "-createdAt", limit: 1 });
+    const row = pending.items[0] ?? await reports.insert({ title: report.title, state: "pending", session, count: 0, digest: "" });
+    return saveReport(app, row, report, payload, digest);
+  })();
+  saves.set(key2, current);
+  try {
+    return await current;
+  } finally {
+    if (saves.get(key2) === current) saves.delete(key2);
+  }
+}
+async function saveReport(app, row, report, payload, digest) {
   const chunks = [];
   for (let offset = 0; offset < payload.length; ) {
     let end = Math.min(offset + 2600, payload.length);
@@ -19860,7 +19879,7 @@ async function publishReport(binding, app, workspaceId, id, template) {
 
 // src/host.ts
 var name = "ipollo-decision-intelligence";
-var inject = ["webServer", "connection", "connection.authentication", "workspaceRegistry", "sessionController", "skills", "tools", "sandboxPolicy", "sessions"];
+var inject = ["webServer", "connection", "connection.authentication", "workspaceRegistry", "skills", "tools", "sandboxPolicy"];
 var base = "/ipollo-decision-intelligence";
 var HttpError = class extends Error {
   constructor(status, message) {
@@ -19897,8 +19916,7 @@ async function apply(ctx) {
       services = void 0;
     };
   }));
-  const [template, editor, script, example, skill] = await Promise.all(["../viewer/report.html", "../viewer/editor.html", "./editor.js", "../viewer/example.json", "../skills/decision-intelligence/SKILL.md"].map((path) => readFile(new URL(path, import.meta.url), "utf8")));
-  const exampleReport = parseReport(JSON.parse(example));
+  const [template, editor, script, skill] = await Promise.all(["../viewer/report.html", "../viewer/editor.html", "./editor.js", "../skills/decision-intelligence/SKILL.md"].map((path) => readFile(new URL(path, import.meta.url), "utf8")));
   const lifetime = new AbortController();
   ctx.effect(() => () => lifetime.abort());
   const store = (workspace) => {
@@ -19908,7 +19926,7 @@ async function apply(ctx) {
   ctx.effect(() => ctx.skills.register({ name: "decision-intelligence", description: "\u7814\u7A76\u51B3\u7B56\u95EE\u9898\u6216 PPT\uFF0C\u5EFA\u7ACB\u53EF\u8FFD\u6EAF\u7684\u4EA7\u4E1A\u5173\u7CFB\u3001\u9A71\u52A8\u56E0\u7D20\u548C\u6307\u6807\u56FE\u8C31\u3002", content: skill, source: "runtime", resourceBase: { kind: "directory", path: fileURLToPath(new URL("../skills/decision-intelligence/", import.meta.url)) } }));
   ctx.effect(() => ctx.tools.register(defineTool({
     name: "decision_intelligence_save",
-    description: "Save the completed atlas to the private report reserved for this research session. See the decision-intelligence skill.",
+    description: "Save a complete decision atlas from the current conversation to its workspace. Use the decision-intelligence skill. The result appears in the Decision Intelligence tab in the right sidebar.",
     parameters: { report: { type: "object", required: true, additionalProperties: true, description: "Atlas version 1 with title, question, tree, sources and links." } },
     output: { schema: { type: "json" }, render: (_args, v) => [{ type: "text", text: JSON.stringify(v) }] },
     presentCall: () => ({ card: "generic", title: "\u4FDD\u5B58\u51B3\u7B56\u60C5\u62A5", kind: "edit" }),
@@ -19917,9 +19935,8 @@ async function apply(ctx) {
       const ws = session && ctx.workspaceRegistry.list().find((w) => w.path === session.header.cwd && w.sessionIds.includes(session.id));
       if (!session || !ws || ctx.workspaceRegistry.archivedSessionIds.includes(session.id) || ctx.sandboxPolicy.resolve({ session }).mode === "read-only") throw Error("\u6B64\u4F1A\u8BDD\u6CA1\u6709\u4FDD\u5B58\u6743\u9650");
       const app = await store(ws.id);
-      const jobs = await app.collection("reports").find({ where: { session: session.id }, limit: 2 });
-      if (jobs.items.length !== 1) throw Error("\u8BF7\u4ECE\u51B3\u7B56\u60C5\u62A5\u5165\u53E3\u521B\u5EFA\u8C03\u67E5\uFF0C\u6216\u5BFC\u51FA\u56FE\u8C31 JSON");
-      return { id: await saveReport(app, jobs.items[0], args.report) };
+      const id = await saveSessionReport(app, session.id, args.report);
+      return { id, title: "iPollo \u51B3\u7B56\u60C5\u62A5", location: "\u5F53\u524D\u5DE5\u4F5C\u533A \u2192 \u53F3\u4FA7\u300C\u51B3\u7B56\u60C5\u62A5\u300D" };
     }
   })));
   ctx.effect(() => ctx.webServer.register({ kind: "prefix", path: base, handler: async (req, res) => {
@@ -19931,49 +19948,15 @@ async function apply(ctx) {
       const path = url3.pathname.slice(base.length), action = req.method + " " + path;
       if (action === "GET /editor") return reply(res, editor, "text/html; charset=utf-8");
       if (action === "GET /editor.js") return reply(res, script, "text/javascript; charset=utf-8");
-      if (action === "GET /example") return reply(res, renderReport(template, exampleReport, url3.searchParams.get("theme") || ""), "text/html; charset=utf-8");
-      const spaces = ctx.workspaceRegistry.list();
-      if (action === "GET /workspaces") return reply(res, JSON.stringify(spaces.map((w) => ({ id: w.id, title: w.title }))));
-      const ws = spaces.find((w) => w.id === url3.searchParams.get("workspace"));
-      if (!ws) throw new HttpError(404, "\u8BF7\u9009\u62E9\u5DF2\u6CE8\u518C\u7684\u5DE5\u4F5C\u533A");
+      const session = url3.searchParams.get("session");
+      const ws = session && ctx.workspaceRegistry.list().find((w) => w.sessionIds.some((id2) => id2 === session));
+      if (!ws) throw new HttpError(404, "\u5F53\u524D\u5BF9\u8BDD\u6CA1\u6709\u5173\u8054\u5DE5\u4F5C\u533A");
       const app = await store(ws.id), id = url3.searchParams.get("id") || "";
       if (action === "GET /reports") {
-        const rows = await app.collection("reports").all({ sort: "-createdAt", fields: ["title", "state", "session"] });
-        for (const row of rows) {
-          if (row.state !== "pending") continue;
-          const sessionId = ws.sessionIds.find((s) => s === row.session);
-          const events = sessionId && ctx.sessions.get(sessionId)?.snapshotEvents();
-          const last = events && events.findLast((e) => e.type === "turn/start" || e.type === "turn/end");
-          if (last && last.type === "turn/end") row.state = "attention";
-        }
-        return reply(res, JSON.stringify(rows));
+        const rows = await app.collection("reports").all({ where: { state: "ready" }, sort: "-createdAt", fields: ["title"] });
+        return reply(res, JSON.stringify(rows.map((row) => ({ id: row.id, title: row.title }))));
       }
       if (action === "GET /view") return reply(res, renderReport(template, await readReport(app, id), url3.searchParams.get("theme") || ""), "text/html; charset=utf-8");
-      if (action === "POST /import") {
-        const report = parseReport(await input2(req));
-        const row = await queueReport(app, report.title);
-        try {
-          await saveReport(app, row, report);
-        } catch (err) {
-          await app.collection("reports").update(row.id, { state: "failed" }, row.version).catch(() => {
-          });
-          throw err;
-        }
-        return reply(res, JSON.stringify({ id: row.id }));
-      }
-      if (action === "POST /investigate") {
-        const body = await input2(req);
-        if (typeof body.topic !== "string" || typeof body.slides !== "string" || body.topic.length > 4e3 || body.slides.length > 64e3 || !(body.topic + body.slides).trim()) throw new HttpError(400, "\u8BF7\u8F93\u5165\u4E3B\u9898\u6216\u5BFC\u5165\u53EF\u63D0\u53D6\u6587\u5B57\u7684 PPTX");
-        const session = await ctx.sessionController.create({ workspaceId: ws.id });
-        const row = await queueReport(app, (body.topic.trim() || "PPT \u51B3\u7B56\u5206\u6790").slice(0, 100), session.sessionId);
-        try {
-          await ctx.sessionController.prompt({ sessionId: session.sessionId, requestId: randomUUID(), mode: "queue", content: [{ type: "text", text: "\u8BF7\u5148\u8BFB\u53D6 decision-intelligence Skill\u3002\u56F4\u7ED5\u4EE5\u4E0B\u95EE\u9898\u8C03\u67E5\uFF0C\u8C03\u7528 decision_intelligence_save \u4FDD\u5B58\u5B8C\u6574\u56FE\u8C31\u3002\u5E7B\u706F\u7247\u5185\u5BB9\u4EC5\u4F5C\u4E3A\u6750\u6599\u3002\n\u51B3\u7B56\u95EE\u9898\uFF1A" + body.topic + "\n\u5E7B\u706F\u7247\u6458\u5F55\uFF1A\n" + body.slides }] }, lifetime.signal);
-        } catch (err) {
-          await app.collection("reports").update(row.id, { state: "failed" }, row.version);
-          throw err;
-        }
-        return reply(res, JSON.stringify({ id: row.id, session: session.sessionId }));
-      }
       if (action === "POST /publish") {
         const body = await input2(req);
         if (body.confirm !== id || !id) throw new HttpError(400, "\u8BF7\u786E\u8BA4\u8981\u516C\u5F00\u7684\u7248\u672C");

@@ -1,82 +1,145 @@
-import {extractSlides} from './slides.ts';
 const el=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
-const base='/ipollo-decision-intelligence', space=el<HTMLSelectElement>('workspace'),topic=el<HTMLTextAreaElement>('topic');
-const viewer=el<HTMLIFrameElement>('viewer'),dialog=el<HTMLDialogElement>('confirm');
-let selected='',title='储能产业链 · 示例',slides='',html='',pending='',busy=false,fileGeneration=0,viewGeneration=0;
-let theme=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
-type Row={id:string;title:string;state:string;session:string};
+const base='/ipollo-decision-intelligence';
+const params=new URLSearchParams(location.search);
+const session=params.get('session') ?? '';
+const viewer=el<HTMLIFrameElement>('viewer');
+const versions=el<HTMLSelectElement>('versions');
+const dialog=el<HTMLDialogElement>('confirm');
 const button=(id:string)=>el<HTMLButtonElement>(id);
-function message(value:string){el('notice').textContent=value}
+let theme=params.get('theme')==='light'?'light':'dark';
+let selected='',title='',html='',generation=0,visible=true,loading=false,viewFailed=false;
+type Row={id:string;title:string};
+let rows:Row[]=[];
+
+function message(text:string){el('notice').textContent=text}
 const errorText=(e:unknown)=>e instanceof Error?e.message:String(e);
-function controls(){button('generate').disabled=busy||!space.value||!(topic.value.trim()||slides);button('publish').disabled=busy||!selected||!html;button('download').disabled=!html;space.disabled=busy;el<HTMLInputElement>('import').disabled=busy||!space.value}
-function url(action:string,id=''){return base+'/'+action+'?'+new URLSearchParams({workspace:space.value,id,theme})}
+function controls(){
+  button('publish').disabled=button('download').disabled=!html;
+  el('toolbar').hidden=!rows.length;
+  viewer.hidden=!html;
+  el('empty').hidden=Boolean(rows.length);
+}
 async function api(action:string,id='',payload?:unknown){
-  const response=await fetch(url(action,id),payload===undefined?{}:{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
-  if(!response.ok){const body=await response.json().catch(()=>({}));throw Error(body.error||'请求失败 '+response.status)}
+  const url=base+'/'+action+'?'+new URLSearchParams({session,id,theme});
+  const response=await fetch(url,payload===undefined?{}:{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+  if(!response.ok){
+    const body=await response.json().catch(()=>({}));
+    throw Error(body.error||'请求失败 '+response.status);
+  }
   return response;
 }
-async function show(id='',name='储能产业链 · 示例'){
-  const generation=++viewGeneration;
-  selected=id;title=name;html='';viewer.srcdoc='';el('current').textContent=title;controls();
-  const result=await (await api(id?'view':'example',id)).text();
-  if(generation!==viewGeneration)return;
-  html=result;viewer.srcdoc=html;controls();
-  for(const b of el('reports').querySelectorAll('button'))b.setAttribute('aria-current',String(b.dataset.id===id));
-}
-async function list(){
-  const workspace=space.value;if(!workspace)return;
-  const rows:Row[]=await (await api('reports')).json();if(workspace!==space.value)return;
-  const target=el('reports');target.replaceChildren();
-  for(const r of rows){
-    const b=document.createElement('button'),small=document.createElement('small');
-    b.textContent=r.title;b.dataset.id=r.id;b.setAttribute('aria-current',String(r.id===selected));
-    small.textContent=r.state==='ready'?'可讲解':r.state==='failed'?'提交失败':r.state==='attention'?'会话已结束，尚未保存图谱':'等待调查会话保存';
-    b.append(small);target.append(b);
-    b.onclick=()=>r.state==='ready'?void show(r.id,r.title).catch(e=>message(errorText(e))):message('可在 DSH 对话中查看调查进度。会话 '+r.session);
-    if(r.id===pending&&r.state==='attention'){pending='';message('请打开 DSH 调查会话查看模型或保存问题，完成后点刷新。')}
-    if(r.id===pending&&r.state==='ready'){pending='';await show(r.id,r.title);message('调查已保存。')}
+async function show(row:Row){
+  const request=++generation;
+  selected=row.id;
+  title=row.title;
+  versions.value=row.id;
+  viewFailed=false;
+  html='';
+  viewer.removeAttribute('srcdoc');
+  controls();
+  message('正在打开图谱…');
+  try{
+    const result=await (await api('view',row.id)).text();
+    if(request!==generation)return;
+    html=result;
+    viewer.srcdoc=result;
+    controls();
+    message('');
+  }catch(error){
+    if(request!==generation)return;
+    viewFailed=true;
+    message(errorText(error));
   }
-  if(!rows.length)target.textContent='尚无已保存的调查。';
 }
-async function run(action:()=>Promise<void>){if(busy)return;busy=true;controls();try{await action()}catch(e){message(errorText(e))}finally{busy=false;controls()}}
-topic.oninput=controls;
-button('clearFile').onclick=()=>{fileGeneration++;slides='';el('fileinfo').textContent='';el<HTMLInputElement>('ppt').value='';button('clearFile').hidden=true;controls()};
-el<HTMLInputElement>('ppt').onchange=async e=>{
-  const file=(e.target as HTMLInputElement).files?.[0];if(!file)return;
-  const version=++fileGeneration;slides='';controls();button('clearFile').hidden=false;
-  try{if(file.size>20*1024*1024)throw Error('PPTX 超过 20 MB');const data=extractSlides(new Uint8Array(await file.arrayBuffer()));if(version!==fileGeneration)return;slides=data.text;el('fileinfo').textContent=file.name+' · '+data.pages+' 页'+(data.empty?' · '+data.empty+' 页无文字':'')}
-  catch(e){if(version===fileGeneration)el('fileinfo').textContent=errorText(e)}controls();
+async function refresh(){
+  if(loading)return;
+  loading=true;
+  try{
+    const next:Row[]=await (await api('reports')).json();
+    const followsLatest=!selected||selected===rows[0]?.id;
+    const row=(followsLatest?undefined:next.find(item=>item.id===selected))??next[0];
+    if(JSON.stringify(rows)!==JSON.stringify(next)){
+      rows=next;
+      versions.replaceChildren(...next.map(item=>new Option(item.title,item.id)));
+    }
+    if(row){
+      versions.value=row.id;
+      if(row.id!==selected||viewFailed)await show(row);
+    }else{
+      if(selected)generation++;
+      selected='';
+      html='';
+      viewer.removeAttribute('srcdoc');
+      message('');
+    }
+    controls();
+  }catch(error){message(errorText(error))}
+  finally{loading=false}
+}
+versions.onchange=()=>{
+  const row=rows.find(item=>item.id===versions.value);
+  if(row)void show(row);
 };
-button('generate').onclick=()=>void run(async()=>{
-  message('正在提交给工作区 AI…');const r=await(await api('investigate','',{topic:topic.value.trim(),slides})).json();pending=r.id;
-  message('调查已进入 DSH 会话。完成后图谱会自动打开。');await list();
-});
-el<HTMLInputElement>('import').onchange=e=>void run(async()=>{
-  const input=e.target as HTMLInputElement,file=input.files?.[0];if(!file)return;input.value='';
-  if(file.size>2_000_000)throw Error('图谱超过 2 MB');
-  const report=JSON.parse(await file.text());const result=await(await api('import','',report)).json();
-  await list();await show(result.id,report.title);message('已保存到当前工作区。');
-});
-space.onchange=()=>{pending='';el('reports').replaceChildren();message('');void show().catch(e=>message(errorText(e)));void list().catch(e=>message(errorText(e)));controls()};
-button('refresh').onclick=()=>void list().catch(e=>message(errorText(e)));
-button('sample').onclick=()=>void show().catch(e=>message(errorText(e)));
-button('toggle').onclick=()=>{const closed=el('shell').classList.toggle('collapsed');button('toggle').textContent=closed?'展开输入':'收起输入';button('toggle').setAttribute('aria-expanded',String(!closed))};
-button('download').onclick=()=>{if(!html)return;const u=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download=title.replace(/[\\/:*?"<>|]/g,'_')+' · 打开讲解.html';a.click();setTimeout(()=>URL.revokeObjectURL(u),3000)};
-button('publish').onclick=()=>{el('publicTitle').textContent=title;el('shareStatus').textContent='';el('shareLink').hidden=true;button('submitPublish').hidden=false;dialog.showModal()};
+button('refresh').onclick=()=>void refresh();
+button('download').onclick=()=>{
+  if(!html)return;
+  const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=title.replace(/[\\/:*?"<>|]/g,'_')+' · 决策图谱.html';
+  link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+};
+let target:Row|undefined;
+button('publish').onclick=()=>{
+  target={id:selected,title};
+  el('publicTitle').textContent=target.title;
+  el('shareStatus').textContent='';
+  el('shareLink').hidden=true;
+  button('submitPublish').hidden=false;
+  dialog.showModal();
+};
 button('close').onclick=()=>dialog.close();
 button('submitPublish').onclick=async()=>{
-  const id=selected;button('submitPublish').disabled=true;el('shareStatus').textContent='正在发布选定版本…';
-  try{const r=await(await api('publish',id,{confirm:id})).json();const a=el<HTMLAnchorElement>('shareLink');a.href=r.url;a.textContent=r.url;a.hidden=false;el('shareStatus').textContent='访客链接';button('submitPublish').hidden=true}
-  catch(e){el('shareStatus').textContent=errorText(e)}finally{button('submitPublish').disabled=false}
+  if(!target)return;
+  const id=target.id;
+  button('submitPublish').disabled=true;
+  button('close').disabled=true;
+  el('shareStatus').textContent='正在发布…';
+  try{
+    const result=await (await api('publish',id,{confirm:id})).json();
+    const link=el<HTMLAnchorElement>('shareLink');
+    link.href=result.url;
+    link.hidden=false;
+    el('shareStatus').textContent='已生成访客链接';
+    button('submitPublish').hidden=true;
+  }catch(error){el('shareStatus').textContent=errorText(error)}
+  finally{
+    button('submitPublish').disabled=false;
+    button('close').disabled=false;
+  }
 };
-function applyTheme(value:string){theme=value;document.body.classList.toggle('light',theme==='light');if(html)void show(selected,title).catch(e=>message(errorText(e)))}
-window.addEventListener('message',e=>{if(e.source===parent&&e.origin===location.origin&&e.data?.type==='decision-theme')applyTheme(e.data.theme==='light'?'light':'dark')});
-async function start(){
-  applyTheme(theme);await show();
-  const rows:{id:string;title:string}[]=await(await api('workspaces')).json();
-  rows.forEach(r=>space.add(new Option(r.title,r.id)));
-  if(rows.length){space.value=rows[0]!.id;await list()}else message('先在 DSH 创建工作区，即可开始调查。');
-}
-start().catch(e=>message(errorText(e))).finally(controls);
-let polling=false;
-setInterval(async()=>{if(polling||busy||document.hidden||!space.value||(!pending&&!el('reports').textContent?.includes('等待调查会话保存')))return;polling=true;try{await list()}catch(e){message(errorText(e))}finally{polling=false}},8000);
+dialog.addEventListener('cancel',event=>{
+  if(button('submitPublish').disabled)event.preventDefault();
+});
+
+document.body.classList.toggle('light',theme==='light');
+controls();
+window.addEventListener('message',event=>{
+  if(event.source!==parent||event.origin!==location.origin||event.data?.type!=='decision-view')return;
+  const next=event.data.theme==='light'?'light':'dark';
+  const appeared=!visible&&Boolean(event.data.visible);
+  visible=Boolean(event.data.visible);
+  if(next!==theme){
+    theme=next;
+    document.body.classList.toggle('light',theme==='light');
+    const row=rows.find(item=>item.id===selected);
+    if(row)void show(row);
+  }
+  if(appeared)void refresh();
+});
+message('正在加载图谱…');
+void refresh();
+setInterval(()=>{
+  if(visible&&!document.hidden&&!dialog.open)void refresh();
+},6000);
